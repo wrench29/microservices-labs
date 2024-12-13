@@ -1,0 +1,45 @@
+services:
+  db:
+    image: postgres:latest
+    user: postgres
+    environment:
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 80s
+  rabbitmq:
+    image: rabbitmq:management
+    ports:
+      - "15672:15672"
+    healthcheck:
+      test: rabbitmq-diagnostics check_port_connectivity
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 10s
+  web:
+    build: ./web-service
+    volumes:
+      - "./uploads/:/code/uploads"
+    ports:
+      - "8000:80"
+    depends_on:
+      db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+  thumbnails-service:
+    build: ./thumbnails-service
+    volumes:
+      - "./uploads/:/code/uploads"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+volumes:
+  db-data:

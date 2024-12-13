@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detailed image</title>
+    <style>
+        #images-container {
+            margin: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <ul id="images-container"></ul>
+    <script>
+        const imagesContainer = document.getElementById("images-container");
+        async function main() {
+            const result = await fetch("/image/{{image_id}}/");
+            if (result.status == 404) {
+                alert("Image not found!");
+                return;
+            }
+            const json = await result.json();
+            for (const [key, value] of Object.entries(json)) {
+                const newP = document.createElement("p");
+                const newLi = document.createElement("li");
+                const newImg = document.createElement("img");
+                newP.innerText = key;
+                newImg.src = value;
+                newLi.appendChild(newP);
+                newLi.appendChild(newImg)
+                imagesContainer.appendChild(newLi);
+            }
+        }
+        main();
+    </script>
+</body>
+
+</html>

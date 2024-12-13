@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MICROSERVICES</title>
+    <style>
+        #images-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 10px;
+        }
+
+        #upload-form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .thumbnail:hover {
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div style="display: inline-block;">
+        <form id="upload-form" method="POST" action="/image/" enctype="multipart/form-data">
+            <label for="image">Upload a new image:</label>
+            <input type="file" id="image" name="file" accept="image/png, image/jpeg, image/webp" required />
+            <input type="submit" value="Upload">
+        </form>
+    </div>
+    <div id="images-container"></div>
+    <script>
+        const imagesContainer = document.getElementById("images-container");
+        async function main() {
+            const result = await fetch("/image/");
+            const images = await result.json();
+            images.forEach(element => {
+                const newImg = document.createElement("img");
+                const imageId = element.split("/")[2];
+                newImg.src = element;
+                newImg.className = "thumbnail";
+                newImg.onclick = () => document.location = `/image/details/${imageId}/`;
+                imagesContainer.appendChild(newImg);
+            });
+        }
+        main();
+    </script>
+</body>
+
+</html>
